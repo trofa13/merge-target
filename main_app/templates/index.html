@@ -1,74 +1,58 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block content %}
-  <main class="container container--mw700">
+{% block content %} 
+<main class="container container--mw700">
+  <!-- Creating a row for treasure panels -->
   <div class="row">
-    {% for treasure in treasures %}
-    <div class="col-md-4">
-        <a href="/{{ treasure.id }}/">
-          <div class="treasure panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">{{ treasure.name }}</h3>
-            </div>
-
-            <div class="panel-body">
-              <div class="treasure-photo">
-                <img src="{{ treasure.image.url }}" >
-              </div>
-            </div>
+  <!-- Looping over each treasure in the treasures list -->
+  {% for treasure in treasures %}
+      <!-- Creating a column for each treasure panel -->
+      <div class="col-md-4">
+      <div class="treasure panel panel-default">
+        <!-- Adding treasure title by username -->
+        <div class="panel-heading">
+          <h3 class="panel-title">{{ treasure.name }}</h3>
+          <a class="panel-username" href="/user/{{treasure.user.username}}/">by: {{ treasure.user.username }}</a>
+        </div>
+        <!-- Adding treasure image -->
+        <div class="panel-body">
+          <a href="/{{treasure.id}}/">
+          <div class="treasure-photo">
+            <img src="{{ treasure.image.url }}">
           </div>
-        </a>
+          </a>
+          <!-- Adding Like Button -->
+          <button id ="likes" data-id="{{treasure.id}}" class="btn btn-mini btn-danger glyphicon glyphicon-heart" type="button">
+            {% if treasure.likes > 0 %} {{ treasure.likes }} {% endif %}
+          </button>
+        </div>
 
-    </div>
-      {% if forloop.counter|divisibleby:3 %}
-        </div><div class="row">
+      </div>
+      </div>
+    <!-- if last column in row -->
+      {% if forloop.counter|divisibleby:3 and not forloop.last %}
+        </div><br><div class="row">
       {% endif %}
-    {% endfor %}
-    </div>
+  {% endfor %}
+  </div><br>
 
-    <div class="treasure panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">
-          Add Treasure
-        </h3>
+<!-- Adding form for adding new treasures-->
+{% if user.is_authenticated %}
+<div class="treasure panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Add Treasure</h3>
+  </div>
+  <div class="panel-body">
+    <form enctype="multipart/form-data" action="post_url/" method="post" >
+      {% csrf_token %}
+      <div class="field-wrapper">
+        {{form.as_p}}
       </div>
-      <div class="panel-body">
-        <form action="post_url/" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </div>
-
-  
-
-  </main>
-
+      <input type="submit" value="Submit" />
+    </form>
+  </div>
+</div>
+{% endif %}
+</main>
 {% endblock %}
-
-
-<!--         <table class="treasure-table">
-  <tr>
-    <th>
-      <img src="{% static "images/material-icon.png" %}" alt="Material Icon">
-      Material:
-    </th>
-    <td>{{ treasure.material }}</td>
-  </tr>
-  <tr>
-    <th>
-      <img src="{% static "images/value-icon.png" %}" alt="Value Icon">
-      Value:
-    </th>
-    <td>${{ treasure.value }}</td>
-  </tr>
-  <tr>
-    <th>
-      <img src="{% static "images/location-icon.png" %}" alt="Location Icon">
-      Location:
-    </th>
-    <td>{{ treasure.location }}</td>
-  </tr>
-</table> -->
